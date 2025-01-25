@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: basic-deployment
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: basic-deployment
+  template:
+    metadata:
+      labels:
+        app: basic-deployment
+    spec:
+      containers:
+      - image: mbani002/basic:1.0.0
+        name: basic-deployment
+        ports:
+        - containerPort: 8501
