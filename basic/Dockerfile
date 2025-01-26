@@ -1,49 +1,33 @@
-# syntax=docker/dockerfile:1.4
+# Use an official Python runtime as a parent image for AMD64 architecture
+FROM --platform=linux/amd64 python:3.11-slim
 
-# -------------------------------
-# 1) Builder stage
-# -------------------------------
-    FROM --platform=$BUILDPLATFORM python:3.11-slim AS builder
+# Set environment variables to optimize Python's behavior in containers
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-    # Set working directory
-    WORKDIR /app
-    
-    # Copy requirements
-    COPY requirements.txt ./
-    
-    # Install build dependencies
-    RUN apt-get update && apt-get install -y --no-install-recommends \
-        build-essential \
-        curl \
-        && rm -rf /var/lib/apt/lists/*
-    
-    # Install Python packages
-    RUN pip install --no-cache-dir -r requirements.txt
-    
-    # -------------------------------
-    # 2) Final (runtime) stage
-    # -------------------------------
-    FROM --platform=$BUILDPLATFORM python:3.11-slim
-    
-    WORKDIR /app
-    
-    # Install only essential runtime packages
-    RUN apt-get update && apt-get install -y --no-install-recommends \
-        curl \
-        && rm -rf /var/lib/apt/lists/*
-    
-    # Copy dependencies installed in builder stage
-    COPY --from=builder /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
-    COPY --from=builder /usr/local/bin/ /usr/local/bin/
-    
-    # Copy app source code
-    COPY . .
-    
-    # Expose default Streamlit port
-    EXPOSE 8501
-    
-    # Optional healthcheck for container orchestrators
-    HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
-    
-    # Run Streamlit server
-    ENTRYPOINT ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+# Set the working directory in the container
+WORKDIR /app
+
+# Install system dependencies (if any)
+# RUN apt-get update && apt-get install -y <your-system-dependencies> && rm -rf /var/lib/apt/lists/*
+
+# Copy the requirements file into the container
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+# Copy the rest of the application code into the container
+COPY . .
+
+# Expose Streamlit's default port
+EXPOSE 8501
+
+# Define environment variables for Streamlit (optional)
+ENV STREAMLIT_SERVER_PORT=8501
+ENV STREAMLIT_SERVER_HEADLESS=true
+ENV STREAMLIT_SERVER_ENABLECORS=false
+ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
+
+# Command to run the Streamlit app
+CMD ["streamlit", "run", "app.py"]

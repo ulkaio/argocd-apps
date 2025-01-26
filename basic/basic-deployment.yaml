@@ -14,7 +14,7 @@ spec:
         app: basic-deployment
     spec:
       containers:
-      - image: mbani002/basic:1.0.3
+      - image: mbani002/basic:1.0.4
         name: basic-deployment
         ports:
         - containerPort: 8501
