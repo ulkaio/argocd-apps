@@ -1,5 +1,5 @@
 IMAGE_NAME := mbani002/basic
-VERSION := 1.0.0
+VERSION := 1.0.1
 
 .PHONY: build push
 
