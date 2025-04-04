@@ -1,2 +1,6 @@
-# argocd-apps
-git@github.com:ulkaio/argocd-apps.git 
+# Project Title
+
+## Description
+A brief description of what this project does and who it's for.
+
+## Installation
